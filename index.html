@@ -1,166 +1,205 @@
-<!DOCTYPE html><html lang="id">
+<!doctype html>
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Model Spiral - RPL</title>
+  <meta charset="utf-8">
+  <title>Kelas X RPL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #4f46e5, #9333ea);
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }h1 {
-  color: white;
-  margin-bottom: 30px;
-  text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-}
-
-#spiralCanvas {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  margin-bottom: 40px;
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  width: 100%;
-  max-width: 1000px;
-  margin-bottom: 40px;
-}
-
-.card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  padding: 20px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-}
-
-.card h2 {
-  margin-top: 0;
-  color: #4f46e5;
-}
-
-.card p {
-  margin: 10px 0;
-  line-height: 1.6;
-}
-
-ul {
-  padding-left: 20px;
-}
-
+      margin:0;
+      font-family: 'Courier New', monospace;
+      color:#e0e0e0;
+      text-align:center;
+      overflow:auto; /* ✅ bisa scroll lagi */
+    }
+    canvas {
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      z-index:-1;
+      background:#000;
+    }
+    header {
+      padding:20px;
+      background:rgba(15,23,42,0.85);
+      border-bottom:3px solid #00b4d8;
+      color:#00b4d8;
+      position:sticky; /* ✅ biar header tetap di atas saat scroll */
+      top:0;
+      z-index:2;
+    }
+    nav {
+      margin:15px 0;
+    }
+    nav button {
+      margin:5px;
+      padding:10px 18px;
+      border:none;
+      background:#00b4d8;
+      color:#0f172a;
+      border-radius:6px;
+      cursor:pointer;
+      font-weight:bold;
+      transition:.2s;
+    }
+    nav button:hover {
+      background:#48cae4;
+    }
+    section {
+      display:none;
+      padding:20px;
+      position:relative;
+      z-index:1;
+      min-height:80vh; /* ✅ kasih tinggi minimum biar bisa scroll */
+    }
+    section.active {
+      display:block;
+      animation:fadeIn .5s;
+    }
+    @keyframes fadeIn {
+      from {opacity:0;}
+      to {opacity:1;}
+    }
+    h2 {
+      color:#90e0ef;
+      margin:20px 0;
+    }
+    ul {list-style:none;padding:0;max-width:400px;margin:auto;}
+    li {
+      background:rgba(44,44,60,0.85);
+      margin:6px 0;
+      padding:10px;
+      border-left:5px solid #00b4d8;
+      text-align:left;
+    }
+    .welcome {
+      margin-top:20px;
+      font-size:14px;
+      color:#90e0ef;
+    }
+    footer {
+      margin-top:20px;
+      padding:10px;
+      background:rgba(15,23,42,0.85);
+      font-size:12px;
+      color:#90e0ef;
+      position:relative;
+      z-index:1;
+    }
+    .cursor {
+      display:inline-block;
+      width:10px;
+      background:#90e0ef;
+      animation:blink 1s infinite;
+    }
+    @keyframes blink {
+      0%,50% {opacity:1;}
+      50.1%,100% {opacity:0;}
+    }
   </style>
 </head>
 <body>
-  <h1>Model Spiral dalam Rekayasa Perangkat Lunak</h1>
-  <canvas id="spiralCanvas" width="500" height="500"></canvas>  <div class="cards">
-    <div class="card">
-      <h2>Planning</h2>
-      <p>Menentukan kebutuhan sistem yang akan dibangun dan tujuan proyek.</p>
-      <p><b>Contoh:</b> Menentukan fitur absensi online untuk sekolah.</p>
-    </div><div class="card">
-  <h2>Risk Analysis</h2>
-  <p>Menganalisis risiko yang mungkin muncul dalam proyek.</p>
-  <p><b>Contoh:</b> Risiko keamanan login siswa, risiko server down saat banyak pengguna.</p>
-</div>
+  <canvas id="matrix"></canvas>
 
-<div class="card">
-  <h2>Engineering</h2>
-  <p>Membangun sistem atau prototipe sesuai kebutuhan yang sudah direncanakan.</p>
-  <p><b>Contoh:</b> Membuat halaman login, absensi, dan dashboard guru.</p>
-</div>
+  <header>
+    <h1>💻 Kelas X RPL 💻</h1>
+    <nav>
+      <button onclick="showPage('welcome')">Welcome</button>
+      <button onclick="showPage('guru')">Guru</button>
+      <button onclick="showPage('murid')">Murid</button>
+    </nav>
+  </header>
 
-<div class="card">
-  <h2>Evaluation</h2>
-  <p>Menguji hasil pengembangan dan menerima feedback dari pengguna.</p>
-  <p><b>Contoh:</b> Guru mencoba fitur absensi dan memberi masukan perbaikan.</p>
-</div>
+  <!-- Halaman 1 -->
+  <section id="welcome" class="active">
+    <h2 id="typing"></h2><span class="cursor"></span>
+    <div class="welcome">"Rekayasa Perangkat Lunak - Coding Our Future"</div>
+  </section>
 
-<div class="card">
-  <h2>Kelebihan Model Spiral</h2>
-  <ul>
-    <li>Fokus pada identifikasi risiko.</li>
-    <li>Fleksibel terhadap perubahan kebutuhan.</li>
-    <li>Cocok untuk proyek besar dan kompleks.</li>
-    <li>Proses iteratif sampai hasil sesuai.</li>
-  </ul>
-</div>
+  <!-- Halaman 2 -->
+  <section id="guru">
+    <h2>Guru</h2>
+    <ul>
+      <li>👨‍🏫 Pak Erfin</li>
+    </ul>
+  </section>
 
-<div class="card">
-  <h2>Kekurangan Model Spiral</h2>
-  <ul>
-    <li>Biaya pengembangan tinggi.</li>
-    <li>Tidak cocok untuk proyek kecil.</li>
-    <li>Membutuhkan keahlian analisis risiko.</li>
-    <li>Dokumentasi bisa menjadi rumit.</li>
-  </ul>
-</div>
+  <!-- Halaman 3 -->
+  <section id="murid">
+    <h2>Daftar Murid</h2>
+    <ul>
+      <li>Ibam</li><li>Ical</li><li>Aisyah</li><li>Ell</li><li>Zemma</li>
+      <li>Bimo</li><li>Fatih</li><li>Hafidz</li><li>Ikhsan Malik</li><li>Ikhsan Saifullah</li>
+      <li>Alsa</li><li>Lailatul</li><li>Laura</li><li>Navika</li><li>Naila</li>
+      <li>Ratu</li><li>Ayu</li><li>Juliano</li><li>Rafi</li><li>Rafa</li>
+      <li>Naufal</li><li>Reyhan</li><li>Wildan</li>
+    </ul>
+  </section>
 
-<div class="card">
-  <h2>Contoh Penerapan Umum</h2>
-  <ul>
-    <li>Aplikasi kasir untuk toko kecil.</li>
-    <li>Sistem e-learning sekolah.</li>
-    <li>Game mobile dengan update berkala.</li>
-    <li>Aplikasi e-commerce skala besar.</li>
-  </ul>
-</div>
+  <footer>
+    &copy; 2025 X RPL | Website by Wildan Pratama
+  </footer>
 
-<div class="card">
-  <h2>Contoh Kasus Nyata</h2>
-  <p><b>1. Sistem Absensi Sekolah Berbasis Web</b></p>
-  <ul>
-    <li><b>Planning:</b> Merencanakan fitur absensi online.</li>
-    <li><b>Risk Analysis:</b> Risiko titip absen → solusi: verifikasi login.</li>
-    <li><b>Engineering:</b> Membuat prototipe login & absensi.</li>
-    <li><b>Evaluation:</b> Guru mencoba sistem & memberi masukan.</li>
-  </ul>
-  <p><b>2. Aplikasi Pemesanan Makanan Online</b></p>
-  <ul>
-    <li><b>Planning:</b> Restoran ingin aplikasi pemesanan.</li>
-    <li><b>Risk Analysis:</b> Risiko server sibuk → solusi: optimasi server.</li>
-    <li><b>Engineering:</b> Fitur keranjang & pembayaran dibuat.</li>
-    <li><b>Evaluation:</b> Pelanggan mencoba versi beta & memberi masukan.</li>
-  </ul>
-</div>
-
-  </div>  <script>
-    const canvas = document.getElementById('spiralCanvas');
-    const ctx = canvas.getContext('2d');
-
-    let angle = 0;
-
-    function drawSpiral() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.beginPath();
-      ctx.strokeStyle = '#4f46e5';
-      ctx.lineWidth = 2;
-      let x = canvas.width / 2;
-      let y = canvas.height / 2;
-      let radius = 5;
-      for (let i = 0; i < 500; i++) {
-        let dx = x + radius * Math.cos(angle + i * 0.1);
-        let dy = y + radius * Math.sin(angle + i * 0.1);
-        ctx.lineTo(dx, dy);
-        radius += 0.1;
-      }
-      ctx.stroke();
-      angle += 0.02;
+  <script>
+    // Navigasi
+    function showPage(id) {
+      document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
     }
 
-    setInterval(drawSpiral, 30);
-  </script></body>
+    // Efek mengetik
+    const text = "WELCOME TO KELAS X RPL";
+    let i = 0;
+    function typeEffect() {
+      if (i < text.length) {
+        document.getElementById("typing").textContent += text.charAt(i);
+        i++;
+        setTimeout(typeEffect, 100);
+      }
+    }
+    window.onload = typeEffect;
+
+    // Background Matrix Effect
+    const canvas = document.getElementById("matrix");
+    const ctx = canvas.getContext("2d");
+
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = "01";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+
+    for (let x = 0; x < columns; x++) drops[x] = 1;
+
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#0f0";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+          drops[i] = 0;
+
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 33);
+
+    // Resize event
+    window.addEventListener("resize", () => {
+      canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth;
+    });
+  </script>
+</body>
 </html>
