@@ -1,0 +1,551 @@
+<!--
+  File: index.html
+  Tempel seluruh file ini. Kode berisi:
+  - Desain mewah (CSS)
+  - Card materi (HTML/CSS/JS)
+  - Modal modern dengan penjelasan lengkap per topik
+  - Tombol "Salin" untuk menyalin contoh kode
+  - Komentar di dalam file untuk menjelaskan tiap bagian
+-->
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Belajar Coding - Wildan (Dengan Modal Penjelasan)</title>
+
+  <!-- Font modern dari Google -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================
+       STYLE UTAMA
+       ============================ */
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html,body { height: 100%; }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(135deg,#14121a 0%, #372e52 50%, #6b5b95 100%);
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      line-height: 1.4;
+      padding-bottom: 60px;
+    }
+
+    header {
+      text-align: center;
+      padding: 48px 16px 24px;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      letter-spacing: 0.4px;
+    }
+    header p { opacity: 0.85; margin-top: 8px; }
+
+    /* Container grid untuk card */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+      gap: 28px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 8px 30px rgba(2,2,10,0.45);
+      transition: transform .28s ease, box-shadow .28s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover { transform: translateY(-10px); box-shadow: 0 18px 40px rgba(0,0,0,0.6); }
+
+    .card h2 { color: #ffd369; margin-bottom: 10px; font-size: 1.25rem; }
+    .card p.small { color: rgba(255,255,255,0.85); margin-bottom: 12px; }
+
+    /* contoh kode di dalam card */
+    .card pre {
+      background: rgba(0,0,0,0.7);
+      color: #8cff7a;
+      padding: 12px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      margin: 12px 0;
+      white-space: pre; /* menjaga spasi */
+    }
+
+    .card button {
+      display: inline-block;
+      background: #ff6f61;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform .15s ease, background .15s ease;
+    }
+    .card button:hover { transform: translateY(-3px); background: #ff856f; }
+
+    footer {
+      text-align: center;
+      padding: 18px;
+      color: rgba(255,255,255,0.75);
+      margin-top: 40px;
+    }
+
+    /* ============================
+       MODAL (POP-UP) STYLING
+       ============================ */
+
+    .modal {
+      display: none; /* default: tersembunyi */
+      position: fixed;
+      inset: 0;
+      background: rgba(4,4,10,0.6);
+      backdrop-filter: blur(6px);
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+      animation: modalFade .28s ease;
+    }
+
+    @keyframes modalFade {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 760px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, #fff, #f9f9fb);
+      color: #222;
+      box-shadow: 0 20px 60px rgba(10,10,30,0.35);
+      overflow: hidden;
+    }
+
+    /* header modal */
+    .modal-header {
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .modal-header h3 { display:flex; gap:8px; align-items:center; font-size:1.05rem; }
+
+    .modal-body {
+      padding: 18px 20px;
+      max-height: 60vh;           /* panjang modal yg bisa discroll */
+      overflow-y: auto;          /* scroll ketika penuh */
+    }
+
+    /* style isi teks di modal */
+    .modal-body h4 { margin-top: 14px; margin-bottom: 8px; color:#333; }
+    .modal-body p { color:#444; margin-bottom: 8px; }
+    .modal-body ul, .modal-body ol { margin-left: 18px; margin-bottom: 10px; color:#444; }
+    .modal-body pre.modal-code {
+      background: #0b0b0b;
+      color: #7ef08a;
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 10px 0;
+      white-space: pre; /* tetap format */
+    }
+
+    .modal-footer {
+      padding: 14px 20px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content: flex-end;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      background: linear-gradient(180deg, rgba(0,0,0,0.01), rgba(0,0,0,0.02));
+    }
+
+    .btn-close {
+      background: #ff6f61;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .copy-btn {
+      background: #2e7dff;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    /* Toast kecil untuk notifikasi "Disalin" */
+    .toast {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 30px;
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 10px;
+      display: none;
+      z-index: 10001;
+      font-weight: 600;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 520px) {
+      header h1 { font-size: 1.6rem; }
+      .modal-card { max-width: 92%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================
+       HEADER
+       ============================ -->
+  <header>
+    <h1>Belajar Coding Bareng Wildan 🚀</h1>
+    <p>Klik tombol "Jalankan" lalu baca penjelasan lengkapnya di pop-up</p>
+  </header>
+
+  <!-- ============================
+       ISI: CARD MATERI
+       ============================ -->
+  <main class="container">
+    <!-- Card HTML -->
+    <article class="card">
+      <h2>HTML Dasar</h2>
+      <p class="small">Bahasa markup untuk membuat struktur halaman web.</p>
+      <!-- contoh singkat -->
+      <pre>&lt;h1&gt;Halo Dunia&lt;/h1&gt;</pre>
+      <!-- tombol memicu modal, data-topik mengirim topik yang akan ditampilkan -->
+      <button class="open-modal" data-topic="html">Jalankan</button>
+    </article>
+
+    <!-- Card CSS -->
+    <article class="card">
+      <h2>CSS Dasar</h2>
+      <p class="small">Style & tampilan — warna, tata letak, animasi.</p>
+      <pre>h1 { color: blue; }</pre>
+      <button class="open-modal" data-topic="css">Jalankan</button>
+    </article>
+
+    <!-- Card JS -->
+    <article class="card">
+      <h2>JavaScript Dasar</h2>
+      <p class="small">Menambah interaksi dan logika pada halaman.</p>
+      <pre>console.log("Halo Dunia");</pre>
+      <button class="open-modal" data-topic="js">Jalankan</button>
+    </article>
+  </main>
+
+  <footer>
+    Dibuat oleh <strong>Wildan Pratama</strong> ✨ — Modal memberi penjelasan lengkap per topik
+  </footer>
+
+  <!-- ============================
+       MODAL: Kontainer pop-up
+       Isi akan di-generate lewat JavaScript (templates)
+       ============================ -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <h3 id="modalTitle">💡 Info</h3>
+        <!-- tombol close kecil (tambahan, tapi fungsinya di footer juga) -->
+        <button class="btn-close" id="modalCloseHeader" aria-label="Tutup">×</button>
+      </div>
+
+      <!-- .modal-body akan diisi innerHTML oleh script -->
+      <div class="modal-body" id="modalBody">
+        <!-- konten dinamis -->
+      </div>
+
+      <div class="modal-footer">
+        <!-- Tombol-tombol ini muncul selalu -->
+        <button class="btn-close" id="modalCloseFooter">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notifikasi -->
+  <div id="toast" class="toast">Disalin ke clipboard</div>
+
+  <!-- ============================
+       SCRIPT JAVASCRIPT
+       - menyimpan template teks lengkap per materi
+       - fungsi showModal(topic) mengisi modalBody lalu menampilkan modal
+       - fitur: klik luar untuk tutup, Escape untuk tutup, tombol salin
+       ============================ -->
+  <script>
+    /* ============================================
+       Template penjelasan lengkap untuk tiap topik
+       - gunakan entitas HTML (&lt; &gt;) saat menampilkan potongan kode
+       ============================================ */
+    const TEMPLATES = {
+      html: `
+        <div>
+          <h4>HTML — Struktur Halaman Web</h4>
+          <p><strong>HTML</strong> (HyperText Markup Language) adalah bahasa <em>markup</em> yang digunakan untuk menstrukturkan konten di web: judul, paragraf, gambar, tautan, form, dan lain-lain.</p>
+
+          <h4>Struktur dasar HTML</h4>
+          <pre class="modal-code">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="id"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;title&gt;Judul Halaman&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Halo Dunia&lt;/h1&gt;
+    &lt;p&gt;Ini paragraf pertama.&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+          </pre>
+          <button class="copy-btn">Salin contoh</button>
+
+          <h4>Tag penting & kegunaannya</h4>
+          <ul>
+            <li><code>&lt;h1&gt; - &lt;h6&gt;</code> : Judul / heading</li>
+            <li><code>&lt;p&gt;</code> : Paragraf teks</li>
+            <li><code>&lt;a href="..."&gt;</code> : Tautan</li>
+            <li><code>&lt;img src="..." alt="..."&gt;</code> : Gambar (alt untuk aksesibilitas)</li>
+            <li><code>&lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;</code> : Daftar</li>
+            <li><code>&lt;form&gt;, &lt;input&gt;</code> : Form input user</li>
+            <li><code>&lt;header&gt;, &lt;nav&gt;, &lt;main&gt;, &lt;footer&gt;</code> : Tag semantik, bantu SEO & aksesibilitas</li>
+          </ul>
+
+          <h4>Atribut umum</h4>
+          <p>Atribut seperti <code>id</code>, <code>class</code>, <code>src</code>, <code>alt</code>, dan <code>href</code> menambahkan informasi pada elemen.</p>
+
+          <h4>Tips & praktik baik</h4>
+          <ol>
+            <li>Gunakan tag semantik untuk struktur yang jelas.</li>
+            <li>Selalu tambahkan <code>alt</code> pada gambar untuk aksesibilitas.</li>
+            <li>Pisahkan struktur (HTML) dan tampilan (CSS).</li>
+          </ol>
+
+          <h4>Latihan singkat</h4>
+          <p>Buat halaman sederhana dengan header, 2 paragraf, gambar, dan link ke Google.</p>
+        </div>
+      `,
+      css: `
+        <div>
+          <h4>CSS — Styling & Layout</h4>
+          <p><strong>CSS</strong> (Cascading Style Sheets) mengatur tampilan: warna, ukuran, jarak, posisi, dan layout elemen HTML.</p>
+
+          <h4>Contoh selector & aturan</h4>
+          <pre class="modal-code">
+/* selector elemen */
+h1 { color: #ff6f61; }
+
+/* selector class */
+.card { padding: 16px; }
+
+/* selector id */
+#header { background: #222; }
+
+/* variabel CSS */
+:root { --primary: #ff6f61; }
+body { color: var(--primary); }
+          </pre>
+          <button class="copy-btn">Salin contoh</button>
+
+          <h4>Box model</h4>
+          <p>Setiap elemen memiliki content, padding, border, margin. Pahami ini saat mengatur ruang antar elemen.</p>
+
+          <h4>Display & layout</h4>
+          <ul>
+            <li><code>display: block / inline / inline-block</code></li>
+            <li><code>flexbox</code> untuk layout baris/kolom: <code>display:flex; align-items:center;</code></li>
+            <li><code>grid</code> untuk layout kompleks</li>
+          </ul>
+
+          <h4>Responsive</h4>
+          <p>Gunakan <code>@media</code> queries atau mobile-first approach untuk tampilan di HP.</p>
+
+          <h4>Tips</h4>
+          <ol>
+            <li>Gunakan class, jangan bergantung banyak pada selector tag saja.</li>
+            <li>Gunakan variabel CSS (<code>--nama</code>) untuk konsistensi warna/spacing.</li>
+          </ol>
+
+          <h4>Latihan</h4>
+          <p>Buat layout dua kolom yang menjadi satu kolom pada layar kecil (mobile).</p>
+        </div>
+      `,
+      js: `
+        <div>
+          <h4>JavaScript — Interaksi & Logika</h4>
+          <p><strong>JavaScript</strong> memberikan perilaku pada web: merespons klik, mengubah isi halaman, memanggil data dari server, dan lain-lain.</p>
+
+          <h4>Contoh dasar: menulis ke console & menangani klik</h4>
+          <pre class="modal-code">
+/* contoh: menampilkan pesan di console */
+console.log('Halo Dunia!');
+
+/* menangkap klik tombol */
+const btn = document.querySelector('button');
+btn.addEventListener('click', function() {
+  console.log('Tombol diklik!');
+});
+          </pre>
+          <button class="copy-btn">Salin contoh</button>
+
+          <h4>Konsep penting</h4>
+          <ul>
+            <li><strong>DOM</strong> (Document Object Model): struktur HTML yang bisa dimanipulasi JS.</li>
+            <li><code>document.querySelector</code>, <code>getElementById</code> untuk pilih elemen.</li>
+            <li><code>addEventListener</code> untuk pasang event (click, input, submit).</li>
+            <li><code>let</code> vs <code>const</code> vs <code>var</code> — gunakan <code>const</code> bila tidak direassign.</li>
+          </ul>
+
+          <h4>Asynchronous singkat</h4>
+          <p>JS bisa menjalankan tugas async: <code>setTimeout</code>, <code>fetch</code> untuk ambil data dari server.</p>
+
+          <h4>Latihan</h4>
+          <ol>
+            <li>Buat tombol yang saat diklik mengganti teks pada &lt;h1&gt;.</li>
+            <li>Coba fetch data palsu (JSON) dan tampilkan di halaman.</li>
+          </ol>
+        </div>
+      `
+    };
+
+    /* ====== Ambil elemen DOM penting ====== */
+    const modal = document.getElementById('modal');
+    const modalBody = document.getElementById('modalBody');
+    const modalTitle = document.getElementById('modalTitle');
+    const toast = document.getElementById('toast');
+
+    // Event: buka modal saat tombol di card diklik
+    document.querySelectorAll('.open-modal').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const topic = e.currentTarget.dataset.topic; // 'html' | 'css' | 'js'
+        showModal(topic);
+      });
+    });
+
+    // Tombol tutup (header dan footer)
+    document.getElementById('modalCloseHeader').addEventListener('click', closeModal);
+    document.getElementById('modalCloseFooter').addEventListener('click', closeModal);
+
+    // klik luar modal untuk menutup
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // tutup pakai tombol Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.style.display === 'flex') closeModal();
+    });
+
+    /**
+     * showModal(topic)
+     * - Mengisi modal dengan template yang cocok
+     * - Menambahkan event listener untuk tombol "Salin"
+     */
+    function showModal(topic) {
+      // isi judul modal sesuai topik
+      const titleMap = { html: 'HTML — Penjelasan Lengkap', css: 'CSS — Penjelasan Lengkap', js: 'JavaScript — Penjelasan Lengkap' };
+      modalTitle.innerHTML = (titleMap[topic] || 'Info');
+
+      // set innerHTML modalBody dari TEMPLATES (isi panjang)
+      modalBody.innerHTML = TEMPLATES[topic] || '<p>Tidak ada konten.</p>';
+
+      // tampilkan modal
+      modal.style.display = 'flex';
+      modal.setAttribute('aria-hidden','false');
+
+      // setelah isi, pasang event listener pada tombol "Salin" yang baru dibuat
+      // gunakan event delegation sederhana:
+      modalBody.querySelectorAll('.copy-btn').forEach((cbtn, idx) => {
+        cbtn.addEventListener('click', () => {
+          // mencari <pre class="modal-code"> yang sebelum tombol (jika ada)
+          const pre = cbtn.previousElementSibling;
+          if (pre && pre.tagName.toLowerCase() === 'pre') {
+            copyToClipboard(pre.innerText);
+          } else {
+            // Jika tidak menemukan, salin seluruh teks modal sebagai fallback
+            copyToClipboard(modalBody.innerText);
+          }
+        });
+      });
+    }
+
+    // Fungsi menutup modal
+    function closeModal() {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden','true');
+      // bersihkan isi agar event listener lama tidak menumpuk jika diinginkan
+      modalBody.innerHTML = '';
+    }
+
+    // Salin teks ke clipboard dan tunjukkan toast
+    function copyToClipboard(text) {
+      if (!navigator.clipboard) {
+        // Fallback lama (create textarea)
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); showToast('Disalin ke clipboard'); }
+        catch (err) { showToast('Gagal menyalin'); }
+        document.body.removeChild(ta);
+        return;
+      }
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Disalin ke clipboard');
+      }).catch(() => {
+        showToast('Gagal menyalin');
+      });
+    }
+
+    // Tampilkan toast sementara
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      toast.style.opacity = '1';
+      // hide setelah 1.6s
+      setTimeout(() => {
+        toast.style.transition = 'opacity .4s';
+        toast.style.opacity = '0';
+        setTimeout(() => { toast.style.display = 'none'; toast.style.transition = ''; }, 420);
+      }, 1400);
+    }
+
+    /* ============================
+       Tambahan: agar modal mendukung fokus keyboard
+       (opsional, meningkatkan aksesibilitas)
+       ============================ */
+    // Fokuskan modal ketika dibuka (agar pengguna keyboard langsung bisa navigasi)
+    const observer = new MutationObserver(() => {
+      if (modal.style.display === 'flex') {
+        // fokus ke tombol tutup footer
+        document.getElementById('modalCloseFooter').focus();
+      }
+    });
+    observer.observe(modal, { attributes: true, attributeFilter: ['style'] });
+
+  </script>
+</body>
+</html>
