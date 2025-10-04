@@ -1,205 +1,356 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <title>Kelas X RPL</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      margin:0;
-      font-family: 'Courier New', monospace;
-      color:#e0e0e0;
-      text-align:center;
-      overflow:auto; /* ✅ bisa scroll lagi */
-    }
-    canvas {
-      position:fixed;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      z-index:-1;
-      background:#000;
-    }
-    header {
-      padding:20px;
-      background:rgba(15,23,42,0.85);
-      border-bottom:3px solid #00b4d8;
-      color:#00b4d8;
-      position:sticky; /* ✅ biar header tetap di atas saat scroll */
-      top:0;
-      z-index:2;
-    }
-    nav {
-      margin:15px 0;
-    }
-    nav button {
-      margin:5px;
-      padding:10px 18px;
-      border:none;
-      background:#00b4d8;
-      color:#0f172a;
-      border-radius:6px;
-      cursor:pointer;
-      font-weight:bold;
-      transition:.2s;
-    }
-    nav button:hover {
-      background:#48cae4;
-    }
-    section {
-      display:none;
-      padding:20px;
-      position:relative;
-      z-index:1;
-      min-height:80vh; /* ✅ kasih tinggi minimum biar bisa scroll */
-    }
-    section.active {
-      display:block;
-      animation:fadeIn .5s;
-    }
-    @keyframes fadeIn {
-      from {opacity:0;}
-      to {opacity:1;}
-    }
-    h2 {
-      color:#90e0ef;
-      margin:20px 0;
-    }
-    ul {list-style:none;padding:0;max-width:400px;margin:auto;}
-    li {
-      background:rgba(44,44,60,0.85);
-      margin:6px 0;
-      padding:10px;
-      border-left:5px solid #00b4d8;
-      text-align:left;
-    }
-    .welcome {
-      margin-top:20px;
-      font-size:14px;
-      color:#90e0ef;
-    }
-    footer {
-      margin-top:20px;
-      padding:10px;
-      background:rgba(15,23,42,0.85);
-      font-size:12px;
-      color:#90e0ef;
-      position:relative;
-      z-index:1;
-    }
-    .cursor {
-      display:inline-block;
-      width:10px;
-      background:#90e0ef;
-      animation:blink 1s infinite;
-    }
-    @keyframes blink {
-      0%,50% {opacity:1;}
-      50.1%,100% {opacity:0;}
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>LoveConfess — Nyatakan Perasaan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0f1724; --card:#0b1220; --muted:#9aa6bb; --accent:#ff6b81; --glass: rgba(255,255,255,0.04);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font-family:'Poppins',sans-serif;
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(255,107,129,0.06), transparent),
+                linear-gradient(180deg,#071026 0%, #071226 100%);
+    color:#e6eef8; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:36px auto;padding:28px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#7c5cff);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px}
+  h1{margin:0;font-size:20px}
+  p.lead{margin:6px 0 0;color:var(--muted)}
+  .grid{display:grid;grid-template-columns:1fr 420px;gap:20px;margin-top:20px}
+  @media(max-width:920px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);padding:18px;border-radius:12px;backdrop-filter: blur(6px);box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
+  .section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  label.small{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+  .question{margin-bottom:12px}
+  .answers button{margin-right:8px;margin-bottom:8px;padding:8px 12px;border-radius:10px;border:0;background:var(--glass);color:var(--muted);cursor:pointer}
+  .answers button.active{background:linear-gradient(90deg,var(--accent),#7c5cff);color:white;transform:translateY(-2px)}
+  .btn{display:inline-block;padding:10px 16px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),#7c5cff);color:#fff;font-weight:600;cursor:pointer}
+  .secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+  .love-meter{height:18px;border-radius:14px;background:#081022;overflow:hidden;margin-top:10px}
+  .love-meter > i{display:block;height:100%;background:linear-gradient(90deg,#ff6b81,#ffb86b);width:0%;transition:width .8s ease}
+  .preview{white-space:pre-wrap;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));padding:12px;border-radius:10px;color:#dfe9ff}
+  input[type="text"], textarea{width:100%;padding:10px;border-radius:10px;border:0;background:rgba(255,255,255,0.03);color:inherit}
+  .row{display:flex;gap:10px}
+  .small{font-size:13px;color:var(--muted)}
+  footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+  .top-actions{display:flex;gap:10px;align-items:center}
+  .toggle{padding:6px 10px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);cursor:pointer}
+  .hint{font-size:12px;color:var(--muted);margin-top:8px}
+</style>
 </head>
 <body>
-  <canvas id="matrix"></canvas>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">♥️</div>
+        <div>
+          <h1>LoveConfess</h1>
+          <p class="lead">Buat tebak-tebakan & nyatakan perasaan dengan elegan.</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button class="toggle secondary" id="darkToggle">Dark Mode</button>
+        <div class="small">By Wildan</div>
+      </div>
+    </header>
 
-  <header>
-    <h1>💻 Kelas X RPL 💻</h1>
-    <nav>
-      <button onclick="showPage('welcome')">Welcome</button>
-      <button onclick="showPage('guru')">Guru</button>
-      <button onclick="showPage('murid')">Murid</button>
-    </nav>
-  </header>
+    <div class="grid">
+      <!-- LEFT: Quiz & Generator -->
+      <div>
+        <div class="card">
+          <div class="section-title">
+            <strong>Love Meter — Tebak Perasaan</strong>
+            <small class="small">Jawab 4 pertanyaan</small>
+          </div>
 
-  <!-- Halaman 1 -->
-  <section id="welcome" class="active">
-    <h2 id="typing"></h2><span class="cursor"></span>
-    <div class="welcome">"Rekayasa Perangkat Lunak - Coding Our Future"</div>
-  </section>
+          <div id="quiz">
+            <div class="question">
+              <label class="small">1. Seberapa sering kalian ngobrol?</label>
+              <div class="answers" data-q="0">
+                <button data-score="0">Hampir nggak</button>
+                <button data-score="2">Kadang</button>
+                <button data-score="4">Sering</button>
+                <button data-score="6">Hampir tiap hari</button>
+              </div>
+            </div>
 
-  <!-- Halaman 2 -->
-  <section id="guru">
-    <h2>Guru</h2>
-    <ul>
-      <li>👨‍🏫 Pak Erfin</li>
-    </ul>
-  </section>
+            <div class="question">
+              <label class="small">2. Reaksinya kalau kamu dekat?</label>
+              <div class="answers" data-q="1">
+                <button data-score="0">Biasa aja</button>
+                <button data-score="2">Tersenyum malu</button>
+                <button data-score="4">Balas cepat</button>
+                <button data-score="6">Nunjukin perhatian</button>
+              </div>
+            </div>
 
-  <!-- Halaman 3 -->
-  <section id="murid">
-    <h2>Daftar Murid</h2>
-    <ul>
-      <li>Ibam</li><li>Ical</li><li>Aisyah</li><li>Ell</li><li>Zemma</li>
-      <li>Bimo</li><li>Fatih</li><li>Hafidz</li><li>Ikhsan Malik</li><li>Ikhsan Saifullah</li>
-      <li>Alsa</li><li>Lailatul</li><li>Laura</li><li>Navika</li><li>Naila</li>
-      <li>Ratu</li><li>Ayu</li><li>Juliano</li><li>Rafi</li><li>Rafa</li>
-      <li>Naufal</li><li>Reyhan</li><li>Wildan</li>
-    </ul>
-  </section>
+            <div class="question">
+              <label class="small">3. Pernah ajak ketemu berdua?</label>
+              <div class="answers" data-q="2">
+                <button data-score="0">Belum</button>
+                <button data-score="3">Ya, sekali</button>
+                <button data-score="6">Sering</button>
+              </div>
+            </div>
 
-  <footer>
-    &copy; 2025 X RPL | Website by Wildan Pratama
-  </footer>
+            <div class="question">
+              <label class="small">4. Intuisi kamu bilang...</label>
+              <div class="answers" data-q="3">
+                <button data-score="0">Nggak</button>
+                <button data-score="3">Mungkin</button>
+                <button data-score="6">Iya banget</button>
+              </div>
+            </div>
 
-  <script>
-    // Navigasi
-    function showPage(id) {
-      document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
+            <div style="margin-top:14px;">
+              <button class="btn" id="calcBtn">Hitung Love Meter</button>
+              <button class="btn secondary" id="resetQuiz">Reset</button>
+              <div class="hint">Hasil bersifat fun & bukan kepastian. Gunakan dengan bijak 🙂</div>
+              <div style="margin-top:12px">
+                <div class="love-meter"><i id="meterBar"></i></div>
+                <div id="meterText" style="margin-top:8px;color:var(--muted)">Skor: —</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    // Efek mengetik
-    const text = "WELCOME TO KELAS X RPL";
-    let i = 0;
-    function typeEffect() {
-      if (i < text.length) {
-        document.getElementById("typing").textContent += text.charAt(i);
-        i++;
-        setTimeout(typeEffect, 100);
-      }
-    }
-    window.onload = typeEffect;
+        <div class="card" style="margin-top:16px">
+          <div class="section-title"><strong>Pembuat Pesan — Nyatakan Perasaan</strong><small class="small">Pilihan template + kustom</small></div>
 
-    // Background Matrix Effect
-    const canvas = document.getElementById("matrix");
-    const ctx = canvas.getContext("2d");
+          <div style="display:grid;gap:10px">
+            <label class="small">Nama orang yang kamu suka (opsional)</label>
+            <input id="crushName" type="text" placeholder="Contoh: Rani">
 
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
+            <label class="small">Masukkan nama kamu (akan muncul jika anonim dimatikan)</label>
+            <input id="yourName" type="text" placeholder="Contoh: Wildan">
 
-    const letters = "01";
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = [];
+            <label style="display:flex;align-items:center;gap:8px;margin-top:6px">
+              <input id="anon" type="checkbox" checked style="transform:scale(1.1)"/> <span class="small">Kirim anonim (jangan cantumkan nama pengirim)</span>
+            </label>
 
-    for (let x = 0; x < columns; x++) drops[x] = 1;
+            <label class="small">Pilih suasana pesan</label>
+            <select id="mood">
+              <option value="romantis">Romantis</option>
+              <option value="lucu">Lucu</option>
+              <option value="serius">Serius</option>
+              <option value="pendek">Singkat & Padat</option>
+            </select>
 
-    function draw() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+            <label class="small">Tambahkan catatan pribadi (opsional)</label>
+            <textarea id="personalNote" rows="3" placeholder="Contoh: ingat hari hujan waktu kita..."></textarea>
 
-      ctx.fillStyle = "#0f0";
-      ctx.font = fontSize + "px monospace";
+            <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+              <button class="btn" id="genBtn">Buat Pesan</button>
+              <button class="btn secondary" id="shuffleBtn">Variasi Acak</button>
+            </div>
 
-      for (let i = 0; i < drops.length; i++) {
-        const text = letters.charAt(Math.floor(Math.random() * letters.length));
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            <div>
+              <label class="small">Pratinjau Pesan</label>
+              <div class="preview" id="preview">Tekan "Buat Pesan" untuk melihat pratinjau.</div>
+            </div>
 
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
-          drops[i] = 0;
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <input id="targetNumber" type="text" placeholder="Nomor WhatsApp tujuan (contoh: 0812xxxx) — kosongkan jika mau salin saja">
+              <button class="btn" id="copyBtn">📋 Salin</button>
+              <button class="btn" id="waBtn">💬 Kirim via WhatsApp</button>
+            </div>
+            <div class="hint">Jika ingin kirim lewat WA langsung, masukkan nomor target lengkap (pakai 0 di depan) — script akan ubah jadi format +62 otomatis.</div>
+          </div>
+        </div>
 
-        drops[i]++;
-      }
-    }
+      </div>
 
-    setInterval(draw, 33);
+      <!-- RIGHT: Tips & Gallery -->
+      <div>
+        <div class="card">
+          <div class="section-title"><strong>Tips sebelum kirim</strong></div>
+          <ul style="color:var(--muted);padding-left:18px;line-height:1.6">
+            <li>Pastikan penerima layak menerima—jangan mengganggu privasi.</li>
+            <li>Kalau ragu, kirim pesan yang sopan dan singkat dulu.</li>
+            <li>Hormati jawaban: terima baik jika tidak sesuai harapan.</li>
+            <li>Gunakan anonim hanya bila aman dan etis.</li>
+          </ul>
+        </div>
 
-    // Resize event
-    window.addEventListener("resize", () => {
-      canvas.height = window.innerHeight;
-      canvas.width = window.innerWidth;
+        <div class="card" style="margin-top:16px">
+          <div class="section-title"><strong>Contoh Template</strong><small class="small">Diedit otomatis oleh generator</small></div>
+          <div class="preview" id="examples">
+Romantis:
+"Hai [nama], akhir-akhir ini aku sering mikirin kamu. Boleh aku jadi orang spesial buat kamu?"
+
+Lucu:
+"Kalau kamu es krim, aku pasti sendoknya — karena ga lengkap tanpa kamu. Bolehkah aku ngajak kamu jalan?"
+
+Singkat:
+"Aku suka kamu. Mau gak kita coba jalan bareng?"
+          </div>
+        </div>
+
+        <footer>
+          © 2025 — Buat untuk main-main & belajar. Gunakan dengan bijak.
+        </footer>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Quiz selection
+  document.querySelectorAll('.answers').forEach(container=>{
+    container.addEventListener('click', e=>{
+      if(e.target.tagName !== 'BUTTON') return;
+      [...container.children].forEach(b=>b.classList.remove('active'));
+      e.target.classList.add('active');
     });
-  </script>
+  });
+
+  const calcBtn = document.getElementById('calcBtn');
+  const meterBar = document.getElementById('meterBar');
+  const meterText = document.getElementById('meterText');
+  const resetQuiz = document.getElementById('resetQuiz');
+
+  calcBtn.addEventListener('click', ()=>{
+    const groups = document.querySelectorAll('.answers');
+    let total=0, answered=0;
+    groups.forEach(g=>{
+      const sel = g.querySelector('button.active');
+      if(sel){ total += parseInt(sel.dataset.score || 0,10); answered++;}
+    });
+    if(answered < groups.length){
+      alert('Jawab semua pertanyaan dulu ya 🙂');
+      return;
+    }
+    const percent = Math.min(100, Math.round(total / (groups.length*6) * 100));
+    meterBar.style.width = percent + '%';
+    let text = '';
+    if(percent < 25) text = 'Kemungkinan kecil — pelan-pelan dulu.';
+    else if(percent < 55) text = 'Ada peluang — coba tingkatkan kedekatan.';
+    else if(percent < 80) text = 'Cukup besar — pertimbangkan untuk mengungkapkan.';
+    else text = 'Wah, besar banget! Coba sampaikan perasaanmu.';
+    meterText.textContent = `Skor: ${percent}% — ${text}`;
+  });
+
+  resetQuiz.addEventListener('click', ()=>{
+    document.querySelectorAll('.answers button.active').forEach(b=>b.classList.remove('active'));
+    meterBar.style.width = '0%'; meterText.textContent = 'Skor: —';
+  });
+
+  // Generator
+  const genBtn = document.getElementById('genBtn');
+  const shuffleBtn = document.getElementById('shuffleBtn');
+  const preview = document.getElementById('preview');
+
+  const templates = {
+    romantis: [
+      "Hai [nama], akhir-akhir ini aku sering mikirin kamu. Bolehkah aku lebih dekat dan jadi seseorang yang selalu ada untukmu? — [pengirim]",
+      "Hai [nama], kehadiranmu selalu bikin hariku lebih berwarna. Aku suka kamu. Maukah kamu memberi aku kesempatan?"
+    ],
+    lucu: [
+      "Kalau kamu es krim, aku sendoknya — karena tanpa kamu ga lengkap. Mau coba jalan bareng nggak? — [pengirim]",
+      "Kamu tuh kayak Wi-Fi gratis: bikin betah dan pengen connected terus. Mau jadi teman spesialku? — [pengirim]"
+    ],
+    serius: [
+      "Halo [nama], aku sudah memikirkan ini lama. Aku menyukaimu dan ingin jujur tentang perasaanku. Apakah kamu bersedia memberi tahu perasaanmu juga? — [pengirim]",
+      "Aku sadar perasaan ini bukan sekadar lewat. Aku ingin serius mengenalmu. Maukah kita bicara lebih dalam?"
+    ],
+    pendek: [
+      "Aku suka kamu. Mau gak kita coba jalan bareng?",
+      "Bolehkah aku jadi seseorang yang spesial untukmu?"
+    ]
+  };
+
+  function makeMessage(){
+    const mood = document.getElementById('mood').value;
+    const crush = document.getElementById('crushName').value.trim();
+    const you = document.getElementById('yourName').value.trim();
+    const note = document.getElementById('personalNote').value.trim();
+    const anon = document.getElementById('anon').checked;
+
+    // pick random template
+    const arr = templates[mood] || templates['romantis'];
+    const tmpl = arr[Math.floor(Math.random()*arr.length)];
+    let msg = tmpl.replace('[nama]', crush || 'kamu').replace('[pengirim]', anon ? '' : (you || ''));
+    if(anon && msg.endsWith(' — ')) msg = msg.replace(/ —\s*$/, '');
+    if(note) msg += "\n\nCatatan: " + note;
+    return msg;
+  }
+
+  genBtn.addEventListener('click', ()=>{
+    preview.textContent = makeMessage();
+  });
+
+  shuffleBtn.addEventListener('click', ()=>{
+    preview.textContent = makeMessage();
+  });
+
+  // Copy & WhatsApp
+  const copyBtn = document.getElementById('copyBtn');
+  const waBtn = document.getElementById('waBtn');
+
+  copyBtn.addEventListener('click', async ()=>{
+    const text = preview.textContent.trim();
+    if(!text){ alert('Belum ada pesan untuk disalin. Klik "Buat Pesan" dulu.'); return; }
+    await navigator.clipboard.writeText(text);
+    alert('Pesan disalin ke clipboard ✅');
+  });
+
+  function normalizeNumber(input){
+    if(!input) return '';
+    let s = input.replace(/\s+/g,'').replace(/\+62|62|^0/, function(m){
+      if(m === '+62' || m === '62') return '62';
+      if(m === '0') return '62';
+      return m;
+    });
+    // if starts with 62 already leave as is; if user entered without 0, ensure correctness:
+    if(!s.startsWith('62')) {
+      // try to remove non-numeric
+      s = s.replace(/\D/g,'');
+      if(s.startsWith('0')) s = '62' + s.slice(1);
+      else s = '62' + s;
+    }
+    return s;
+  }
+
+  waBtn.addEventListener('click', ()=>{
+    const text = preview.textContent.trim();
+    if(!text){ alert('Belum ada pesan. Klik "Buat Pesan" dulu.'); return; }
+    const numRaw = document.getElementById('targetNumber').value.trim();
+    if(!numRaw){
+      alert('Masukkan nomor WhatsApp tujuan di kotak sebelah kiri jika mau kirim langsung. Atau salin pesan dan kirim manual.');
+      return;
+    }
+    const normalized = normalizeNumber(numRaw);
+    if(!/^\d+$/.test(normalized) || normalized.length<9){ alert('Nomor tidak valid. Coba lagi.'); return; }
+    const encoded = encodeURIComponent(text);
+    const url = `https://wa.me/${normalized}?text=${encoded}`;
+    window.open(url, '_blank');
+  });
+
+  // small niceties
+  document.getElementById('darkToggle').addEventListener('click', ()=>{
+    // simple toggle that inverts background (not full theme)
+    document.body.classList.toggle('alt');
+    if(document.body.classList.contains('alt')){
+      document.documentElement.style.setProperty('--bg','#f7f9ff');
+      document.documentElement.style.setProperty('--card','#ffffff11');
+      document.documentElement.style.setProperty('--muted','#415466');
+      document.documentElement.style.setProperty('--accent','#ff6b81');
+    } else {
+      document.documentElement.style.setProperty('--bg','#0f1724');
+      document.documentElement.style.setProperty('--card','#0b1220');
+      document.documentElement.style.setProperty('--muted','#9aa6bb');
+    }
+    alert('Mode toggle: ini demo sederhana. Untuk mode penuh, styling bisa dikembangkan lagi.');
+  });
+
+  // initial example
+  preview.textContent = "Tekan \"Buat Pesan\" untuk membuat pesan pernyataan perasaan otomatis.";
+</script>
 </body>
 </html>
